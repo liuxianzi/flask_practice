@@ -5,9 +5,14 @@
  @Description    用户登录示例
  @Author         
 """
-from flask import Flask, render_template, request, redirect, jsonify
+from flask import Flask, render_template, request, redirect, jsonify, url_for
 
 app = Flask(__name__)
+
+DATA_DICT = {
+    '1': {'name': 'xiaoming', 'age': 18},
+    '2': {'name': 'xiaodai', 'age': 19}
+}
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -24,11 +29,25 @@ def login():
     return render_template('login.html', error=error)
 
 
-@app.route('/index')
+@app.route('/index', endpoint='idx')  # endpoint相当于起别名的意思
 def index():
-    return '首页'
+    return render_template('index.html', data=DATA_DICT)
+
+
+@app.route('/edit')
+def edit():
+    nid = request.args.get('nid')
+    print(DATA_DICT[nid])
+    DATA_DICT[nid]['age'] += 1
+    return redirect(url_for('idx'))
+
+
+@app.route('/del/<int:uid>')
+def delete(uid):
+    DATA_DICT.pop(str(uid))
+    # url_for根据别名跳转
+    return redirect(url_for('idx'))
 
 
 if __name__ == '__main__':
-    print(app.route)
     app.run(debug=True)

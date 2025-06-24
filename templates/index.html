@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <h1>数据</h1>
+  <table border="1" style="border-collapse: collapse">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>姓名</th>
+            <th>年龄</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for k, v in data.items() %}
+            <tr>
+                <td>{{k}}</td>
+                <td>{{v.name}}</td>
+                <td>{{v.age}}</td>
+                <td>
+                    <a href="/edit?nid={{k}}">修改</a>
+                    <a href="/del/{{k}}">删除</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
