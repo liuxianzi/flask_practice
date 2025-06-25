@@ -29,17 +29,23 @@ def login():
     return render_template('login.html', error=error)
 
 
-@app.route('/index', endpoint='idx')  # endpoint相当于起别名的意思
+@app.route('/index', endpoint='idx')  # endpoint相当于起别名的意思,不能重名 否则报错
 def index():
     return render_template('index.html', data=DATA_DICT)
 
 
-@app.route('/edit')
+@app.route('/edit', methods=['GET', 'POST'])
 def edit():
     nid = request.args.get('nid')
-    print(DATA_DICT[nid])
-    DATA_DICT[nid]['age'] += 1
-    return redirect(url_for('idx'))
+    info = DATA_DICT[nid]
+    if request.method == 'GET':
+        return render_template('edit.html', info=info)
+    else:
+        name = request.form.get('username')
+        age = request.form.get('age')
+        info['name'] = name
+        info['age'] = age
+        return redirect(url_for('idx'))
 
 
 @app.route('/del/<int:uid>')
