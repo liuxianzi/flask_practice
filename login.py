@@ -5,9 +5,11 @@
  @Description    用户登录示例
  @Author         
 """
-from flask import Flask, render_template, request, redirect, jsonify, url_for
+import functools
+from flask import Flask, render_template, request, redirect, jsonify, url_for, session
 
 app = Flask(__name__)
+app.secret_key = 'zhelixiansuibianxie'  # 这里先随便写（其实按理是根据一个标准生成的
 
 DATA_DICT = {
     '1': {'name': 'xiaoming', 'age': 18},
@@ -24,17 +26,29 @@ def login():
     username = request.form.get('usr')
     password = request.form.get('pwd')
     if username == 'xiaoming' and password == '123':
+        session[username] = 'record'  # session保存
         return redirect('/index')
     error = '用户名或密码错误'
     return render_template('login.html', error=error)
 
 
-@app.route('/index', endpoint='idx')  # endpoint相当于起别名的意思,不能重名 否则报错
+def auth(func):
+    @functools.wraps(func)
+    def wrap(*args, **kwargs):
+        if session.get('xiaoming') != 'record':
+            return redirect(url_for('login'))
+        return func(*args, **kwargs)
+    return wrap
+
+
+@app.route('/index', endpoint='idx')  # endpoint相当于起别名的意思,不能重名 否则报错，若没声明endpoint，则默认别名是函数名
+@auth
 def index():
     return render_template('index.html', data=DATA_DICT)
 
 
 @app.route('/edit', methods=['GET', 'POST'])
+@auth
 def edit():
     nid = request.args.get('nid')
     info = DATA_DICT[nid]
@@ -49,6 +63,7 @@ def edit():
 
 
 @app.route('/del/<int:uid>')
+@auth
 def delete(uid):
     DATA_DICT.pop(str(uid))
     # url_for根据别名跳转
