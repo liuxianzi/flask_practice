@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <form action="" method="post" enctype="multipart/form-data">
+    请上传文件：<input type="file" name="upload_file">
+    <br><br>
+    <button type="submit">提交文件</button>
+  </form>
+
+  <br><br>
+  <a href="/add">新增书籍</a>
+
+  <br><br>
+  <table border="1" style="border-collapse: collapse">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>书名</th>
+            <th>作者</th>
+            <th>价格(元)</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+            <tr>
+                <td>{{book[0]}}</td>
+                <td>{{book[1]}}</td>
+                <td>{{book[2]}}</td>
+                <td>{{book[3]}}</td>
+                <td>
+                    <a href="/update?bid={{book[0]}}">修改</a>
+                    <a href="/del?bid={{book[0]}}">删除</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+
+</body>
+</html>
