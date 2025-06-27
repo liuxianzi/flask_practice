@@ -23,7 +23,7 @@ class SqlHelper(object):
             port=3306,
             user='root',
             password='',
-            database='newdjango',
+            database='newflask',
             charset='utf8'
         )
 
@@ -53,6 +53,32 @@ class SqlHelper(object):
         result = cursor.fetchall()
         self.close(conn, cursor)
         return result
+
+    def execute(self, sql, *args):
+        """执行"""
+        conn, cursor = self.connect()
+        try:
+            ret = cursor.execute(sql, args)
+            conn.commit()
+            db.close(conn, cursor)
+            return ret
+        except Exception as e:
+            conn.rollback()
+            db.close(conn, cursor)
+            raise Exception({'error': e})
+
+    def execute_many(self, sql, datas):
+        """插入多条数据"""
+        conn, cursor = self.connect()
+        try:
+            ret = cursor.executemany(sql, datas)
+            conn.commit()
+            db.close(conn, cursor)
+            return ret
+        except Exception as e:
+            conn.rollback()
+            db.close(conn, cursor)
+            raise Exception({'error': e})
 
 
 # 声明一个对象 确保每次引入的是同一个对象(单例)

@@ -8,7 +8,7 @@
 import os
 import pandas as pd
 from flask import Blueprint, render_template, request, redirect
-from ..common.db_cursor import conn, create_table
+from ..common.sqlhelper import db
 
 
 books = Blueprint('upload', __name__)
@@ -16,13 +16,10 @@ books = Blueprint('upload', __name__)
 
 @books.route('/book', methods=['GET', 'POST'])
 def book():
-    db, cursor = conn()
     if request.method == 'GET':
         """读取所有数据库的书籍数据"""
         sql = 'select * from book;'
-        cursor.execute(sql)
-        rets = cursor.fetchall()
-        cursor.close()
+        rets = db.fetchall(sql)
         return render_template('book.html', books=rets)
 
     file = request.files.get('upload_file')
@@ -38,24 +35,21 @@ def book():
     datas = df.values.tolist()  # 获取所有数据在一个列表中
     # 写入数据
     sql = "show tables like 'book'"
-    ret = cursor.execute(sql)
+    ret = db.execute(sql)
     if not ret:
         sql = 'create table book(id bigint auto_increment primary key, title varchar(50) not null , ' \
               'author varchar(200) not null , price int default null)'
-        create_table(cursor, sql)
+        _ = db.execute(sql)
     sql = f"""insert into book(title, author, price) value(%s, %s, %s)"""
     try:
-        cursor.executemany(sql, datas)
-        db.commit()
+        _ = db.execute_many(sql, datas)
     except Exception as e:
         print('插入数据出错：', e)
-        db.rollback()
-    return render_template('book.html')
+    return redirect(request.url)
 
 
 @books.route('/add', methods=['GET', 'POST'])
 def add():
-    db, cursor = conn()
     if request.method == 'GET':
         return render_template('add_book.html')
     title = request.form.get('title')
@@ -63,21 +57,16 @@ def add():
     price = request.form.get('price')
 
     sql = """insert into book(title,author,price) values (%s,%s,%s)"""
-    cursor.execute(sql, (title, author, price))
-    db.commit()
-    cursor.close()
+    db.execute(sql, title, author, price)
     return redirect('/book')
 
 
 @books.route('/update', methods=['GET', 'POST'])
 def update():
     bid = int(request.args.get('bid'))
-    db, cursor = conn()
     if request.method == 'GET':
         sql = """select * from book where id=%s"""
-        cursor.execute(sql, bid)
-        ret = cursor.fetchone()
-        cursor.close()
+        ret = db.fetchone(sql, bid)
         return render_template('edit_book.html', ret=ret)
 
     title = request.form.get('title')
@@ -85,19 +74,15 @@ def update():
     price = request.form.get('price')
 
     sql = """update book set title=%s,author=%s,price=%s where id=%s"""
-    cursor.execute(sql, (title, author, price, bid))
-    db.commit()
-    cursor.close()
+    db.execute(sql, title, author, price, bid)
     return redirect('/book')
 
 
 @books.route('/del')
 def delete():
     bid = int(request.args.get('bid'))
-    db, cursor = conn()
     sql = """delete from book where id=%s"""
-    cursor.execute(sql, bid)
-    db.commit()
+    db.execute(sql, bid)
     return redirect('/book')
 
 
