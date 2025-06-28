@@ -10,7 +10,12 @@ from flask import Flask
 app = Flask(__name__)
 
 # 引入配置文件
-app.config.from_object('config.settings')
+# 方式1：基于全局变量
+# app.config.from_object('config.settings')
+# 方式2：基于类的方式
+# app.config.from_object('config.allsettings.ProdSettings')
+# app.config.from_object('config.allsettings.TestSettings')
+app.config.from_object('config.allsettings.LocalSettings')
 
 
 @app.route('/index')
