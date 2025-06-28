@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <h1>静态文件</h1>
+  <img src="/static/pic/fish.jpg" alt="">
+
+  <!-- 更推荐这种写法 更专业一些-->
+  <img src="{{url_for('static', filename='pic/fish.jpg')}}" alt="">
+</body>
+</html>
