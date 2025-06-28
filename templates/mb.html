@@ -1,0 +1,8 @@
+{% extends 'layout.html' %}
+
+{% block context %}
+  书籍：{{ books }}
+  书籍：{{ books[1] }}
+  {{ func('haha') }}
+  {% include 'login.html' %}
+{% endblock %}
