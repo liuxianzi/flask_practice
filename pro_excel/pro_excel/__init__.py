@@ -5,6 +5,7 @@
  @Description    蓝图（blue print）项目
  @Author         
 """
+import click
 from flask import Flask
 from .views.login import sess
 from .views.excel import books
@@ -17,6 +18,11 @@ def create_app():
     @app.route('/index')
     def index():
         return 'index'
+
+    @app.cli.command('index')
+    @click.argument('name')
+    def home(name):
+        print('你好'+name)
 
     app.register_blueprint(sess)
     app.register_blueprint(books)
